@@ -53,6 +53,7 @@ export class Place{
 export class District {
     places: Place[];
     maxPopulation: number;
+    availableIndex: number = 0;
     constructor(public name: string, public position: Position, num: number, max: number) {
         this.places = [];
         for (let i = 0; i < num; i++) {
@@ -68,18 +69,28 @@ export class District {
         }
     }
 
+    beforeSceneStart() {
+        this.availableIndex = 0;
+    }
+
     get isFull(): boolean {
-        return this.population >= this.maxPopulation;
+        while (this.availableIndex < this.places.length) {
+            if (this.places[this.availableIndex].isFull) {
+                this.availableIndex++;
+            } else {
+                break;
+            }
+        }
+
+        return this.availableIndex >= this.places.length;
     }
 
     randomPlace = (): Place => {
-        if (this.places.length === 0) {
+        if (this.isFull) {
             throw new Error();
         }
 
-        const index = Math.floor(Math.random() * this.places.length);
-        // TODO: avoid place that's full
-        return this.places[index];
+        return this.places[this.availableIndex];
     };
 
     get population() {

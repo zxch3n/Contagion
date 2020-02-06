@@ -1,11 +1,10 @@
-import { District, Place } from "./District";
+import { District, } from "./District";
 import { Position, IllState, MedicalParam, QuanrantineState } from "./type";
 import { Individual } from "./Individual";
 
 export class Hospital extends District {
     name = "hospital";
     doctors: Individual[] = [];
-    availableIndex: number = 0;
     constructor(
         public param: MedicalParam,
         public medicalBed: District,
@@ -21,10 +20,6 @@ export class Hospital extends District {
         this.medicalBed.mapPeople(this.examPerson);
     }
 
-    beforeSceneStart() {
-        this.availableIndex = 0;
-    }
-
     get isFull(): boolean {
         while (this.availableIndex < this.places.length) {
             if (!this.doctors[this.availableIndex].isWorking) {
@@ -38,14 +33,6 @@ export class Hospital extends District {
 
         return this.availableIndex >= this.places.length;
     }
-
-    randomPlace = (): Place => {
-        if (this.isFull) {
-            throw new Error();
-        }
-
-        return this.places[this.availableIndex];
-    };
 
     hospitalize(person: Individual) {
         if (this.medicalBed.isFull) {

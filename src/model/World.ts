@@ -227,9 +227,15 @@ export class World implements IWorld {
         }
     }
 
+    beforeSceneStart() {
+        for (const district of Object.values(this.districts) as District[]) {
+            district.beforeSceneStart();
+        }
+    }
+
     step() {
         this.upgradeDisease();
-        this.districts.hospital.beforeSceneStart();
+        this.beforeSceneStart();
         this.preMove();
         this.infect();
         if (this.datetime.scene === 0) {
