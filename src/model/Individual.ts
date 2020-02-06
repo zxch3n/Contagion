@@ -48,7 +48,7 @@ export class Individual implements IIndividual{
             return;
         }
 
-        this.beInPlace(publicTransportDistrict.randomPlace());
+        this.beInPlace(publicTransportDistrict.nextAvailablePlace());
     }
 
     beInPlace(place: Place) {
@@ -68,7 +68,7 @@ export class Individual implements IIndividual{
         }
 
         if (!districts.hospital.isFull && this.treatmentState.quanrantine === QuanrantineState.atHome) {
-            this.beInPlace(districts.hospital.randomPlace());
+            this.beInPlace(districts.hospital.nextAvailablePlace());
             return;
         }
 
@@ -83,8 +83,17 @@ export class Individual implements IIndividual{
         }
 
         if (this.targetingFacilityPlaces.length >= 1) {
-            const index = Math.floor(Math.random() * this.targetingFacilityPlaces.length);
-            this.beInPlace(this.targetingFacilityPlaces[index]);
+            let index = Math.floor(Math.random() * this.targetingFacilityPlaces.length);
+            let count = 0;
+            while (this.targetingFacilityPlaces[index].isFull && count < this.targetingFacilityPlaces.length) {
+                index = (index + 1) % this.targetingFacilityPlaces.length;
+                count++;
+            }
+
+            // if not full
+            if (count !== this.targetingFacilityPlaces.length) {
+                this.beInPlace(this.targetingFacilityPlaces[index]);
+            }
         }
     }
 
@@ -101,7 +110,7 @@ export class Individual implements IIndividual{
             return;
         }
 
-        this.beInPlace(district.randomPlace());
+        this.beInPlace(district.nextAvailablePlace());
     }
 
     goRandomPlace(districts: Districts) {

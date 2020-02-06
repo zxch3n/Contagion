@@ -14,7 +14,8 @@
     "forceConsistentCasingInFileNames": true,
     "module": "UMD",
     "moduleResolution": "node",
-    "resolveJsonModule": true,
+    // "resolveJsonModule": true,
+    "experimentalDecorators": true,
     "isolatedModules": true,
     "noEmit": true,
     "jsx": "react"

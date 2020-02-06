@@ -39,7 +39,7 @@ export class Hospital extends District {
             person.treatmentState.quanrantine = QuanrantineState.atHome;
         } else {
             person.treatmentState.quanrantine = QuanrantineState.atHospital;
-            person.beInPlace(this.medicalBed.randomPlace());
+            person.beInPlace(this.medicalBed.nextAvailablePlace());
         }
     }
 

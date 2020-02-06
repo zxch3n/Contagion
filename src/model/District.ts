@@ -74,24 +74,24 @@ export class District {
     }
 
     get isFull(): boolean {
-        while (this.availableIndex < this.places.length) {
-            if (this.places[this.availableIndex].isFull) {
-                this.availableIndex++;
-            } else {
-                break;
-            }
-        }
+        while (this.places.length > this.availableIndex && this.places[this.availableIndex].isFull) {
+            this.availableIndex++;
+        } 
 
         return this.availableIndex >= this.places.length;
     }
 
-    randomPlace = (): Place => {
+    nextAvailablePlace = (): Place => {
         if (this.isFull) {
             throw new Error();
         }
 
         return this.places[this.availableIndex];
     };
+
+    randomPlace = (): Place => {
+        return this.places[Math.floor(Math.random() * this.places.length)];
+    }
 
     get population() {
         let sum = 0;

@@ -14,6 +14,7 @@ import { Individual } from "./Individual";
 import { District, LivingQuater } from "./District";
 import { Hospital } from "./Hospital";
 
+
 export class World implements IWorld {
     disease: IDisease;
     districts: Districts;
