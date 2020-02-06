@@ -44,6 +44,10 @@ export class Place{
     get length() {
         return this.people.size;
     }
+
+    get isFull() {
+        return this.people.size >= this.max;
+    }
 }
 
 export class District {
@@ -85,5 +89,28 @@ export class District {
         }
 
         return sum;
+    }
+}
+
+export class LivingQuater extends District {
+    public name: string = 'living';
+    private fillIndex: number = 0;
+    constructor(public position: Position, distribution: [number, number][]) {
+        super('living', position, 0, 0);
+        let index = 0;
+        for (const [num, familySize] of distribution) {
+            for (let i = 0; i < num; i ++) {
+                this.places.push(new Place(index, this, {x: 0, y: 0}, familySize))
+                index ++;
+            }
+        }
+    }
+
+    nextFillingPlace() {
+        if (this.places[this.fillIndex].isFull) {
+            this.fillIndex++;
+        }
+
+        return this.places[this.fillIndex];
     }
 }

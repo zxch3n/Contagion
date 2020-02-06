@@ -123,8 +123,7 @@ export class Individual implements IIndividual{
                 this.visitingHospitalRate = 1;
             }
         } else if (this.illState === IllState.exposedInfactious) {
-            // this.treatmentState.quanrantine = QuanrantineState.atHome;
-            this.visitingHospitalRate = 1;
+            this.visitingHospitalRate = 0.2;
         } 
     }
 }

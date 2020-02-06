@@ -1,5 +1,5 @@
 import { Hospital } from "./Hospital";
-import { Place, District } from "./District";
+import { Place, District, LivingQuater } from "./District";
 
 export interface IDisease {
     name: string;
@@ -77,7 +77,6 @@ export interface MedicalParam {
 }
 
 export interface FamilyParam {
-    // TODO:
     familyPopulationDistribution: [number, number][];
     partyRate: number;
 }
@@ -85,7 +84,6 @@ export interface FamilyParam {
 export interface WorldParam {
     disease: IDisease;
     numberOfScenePerDay: number; // 一天几幕, default 3
-    population: number;
     region: RegionalParam;
     medicine: MedicalParam;
     family: FamilyParam;
@@ -105,7 +103,7 @@ export interface DateTime {
 }
 
 export interface Districts {
-    living: District,
+    living: LivingQuater,
     work: District,
     publicTransport: District,
     hospital: Hospital,

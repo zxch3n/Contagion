@@ -11,7 +11,7 @@ import {
     QuanrantineState
 } from "./type";
 import { Individual } from "./Individual";
-import { District } from "./District";
+import { District, LivingQuater } from "./District";
 import { Hospital } from "./Hospital";
 
 export class World implements IWorld {
@@ -20,29 +20,33 @@ export class World implements IWorld {
     datetime: DateTime;
     numberOfScenePerDay: number;
     individuals: Individual[];
+    population: number = 0;
 
     constructor(public param: WorldParam) {
         this.numberOfScenePerDay = param.numberOfScenePerDay;
         this.disease = param.disease;
         this.individuals = [];
+        for (const [num, familySize] of param.family.familyPopulationDistribution) {
+            this.population += num * familySize;
+        }
+
         const medicalBed = new District(
             "medicalBed",
             { x: 0, y: 0 },
             param.medicine.medicalBedNumber,
             1
         );
+
         this.districts = {
             medicalBed,
-            living: new District(
-                "living",
+            living: new LivingQuater(
                 { x: 0, y: 0 },
-                param.population / 10,
-                10
+                param.family.familyPopulationDistribution
             ),
             publicTransport: new District(
                 "publicTransport",
                 { x: 0, y: 0 },
-                param.population / 30,
+                this.population / 30,
                 30
             ),
             hospital: new Hospital(
@@ -55,20 +59,20 @@ export class World implements IWorld {
             facility: new District(
                 "facility",
                 { x: 0, y: 0 },
-                param.population / 20,
+                this.population / 20,
                 20
             ),
             work: new District(
                 "work",
                 { x: 0, y: 0 },
-                param.population / 10,
+                this.population / 10,
                 10
             ),
             cemetery: new District("cemetery", { x: 0, y: 0 }, 1, 50000)
         };
 
-        for (let i = 0; i < param.population; i++) {
-            const home = this.districts.living.randomPlace();
+        for (let i = 0; i < this.population; i++) {
+            const home = this.districts.living.nextFillingPlace();
             const hasCar = Math.random() < param.region.privateCarRate;
             const individual = new Individual({
                 isDoctor: false,
@@ -80,7 +84,6 @@ export class World implements IWorld {
                 targetingFacilityPlaces: Array(param.region.facilityActiveRate)
                     .fill(0)
                     .map(this.districts.facility.randomPlace),
-                // TODO: set visiting hospital rate
                 visitingHospitalRate: this.param.medicine.visitingHospitalRate,
                 wearMask: false,
                 hospitalPlace: undefined,
@@ -96,7 +99,7 @@ export class World implements IWorld {
 
         const docNum = param.medicine.doctorNum;
         for (let i = 0; i < docNum; i++) {
-            const index = Math.floor(Math.random() * param.population);
+            const index = Math.floor(Math.random() * this.population);
             this.individuals[index].isDoctor = true;
             this.individuals[index].workPlace = this.districts.hospital.places[
                 i

@@ -61,5 +61,3 @@ export class Hospital extends District {
         }
     };
 }
-
-// TODO: some rooms may not have doctors

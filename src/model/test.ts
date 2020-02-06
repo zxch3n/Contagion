@@ -12,7 +12,12 @@ const world = new World({
         toLatentlyInfactiousRate: 1 / 3 / 4,
     },
     family: {
-        familyPopulationDistribution: [],
+        familyPopulationDistribution: [
+            [1000, 2],
+            [500, 4],
+            [250, 8],
+            [125, 16]
+        ],
         partyRate: 0.1,
     },
     medicine: {
@@ -22,11 +27,10 @@ const world = new World({
         doctorNum: 200,
         infactiousRateBetweenDoctorAndPatient: 0,
         infactiousRateBetweenPatients: 1 / 3000,
-        medicalBedNumber: 0
+        medicalBedNumber: 500
     },
     numberOfScenePerDay: 3,
     origin: 'living',
-    population: 10000,
     region: {
         densityOfPopulation: 10,
         doPeriodicPhysicalExamination: true,
