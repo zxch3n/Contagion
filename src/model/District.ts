@@ -14,10 +14,6 @@ export class Place{
 
     push(id: Individual) {
         this.people.add(id);
-        // FIXME: Error
-        // if (this.max < this.people.length) {
-        //     throw new Error();
-        // }
     }
 
     merge(place: Place) {

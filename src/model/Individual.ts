@@ -1,4 +1,4 @@
-import {IDisease, IIndividual, Position, isInfectious, IllState, Districts, TreatmentState, QuanrantineState, MedicalParam, IndividualParam} from './type';
+import {IDisease, IIndividual, IllState, Districts, TreatmentState, QuanrantineState, MedicalParam, IndividualParam} from './type';
 import {upgradeIll} from './Disease';
 import { Place, District } from './District';
 import { Hospital } from './Hospital';

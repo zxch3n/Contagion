@@ -27,10 +27,10 @@ const world = new World({
         cureRateOnMedicalBed: 0.0004,
         deteriorateFactorOnMedicalBed: 0.5,
         visitingHospitalRate: 0.005,
-        doctorNum: 200,
+        doctorNum: 50,
         infactiousRateBetweenDoctorAndPatient: 1 / 9000,
         infactiousRateBetweenPatients: 1 / 3000,
-        medicalBedNumber: 0
+        medicalBedNumber: 100
     },
     individual: {
         goOutRateWhenQuarantedAtHome: 0.01,

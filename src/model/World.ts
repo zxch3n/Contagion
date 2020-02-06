@@ -55,7 +55,7 @@ export class World implements IWorld {
                 medicalBed,
                 { x: 0, y: 0 },
                 param.medicine.doctorNum,
-                5
+                20
             ),
             facility: new District(
                 "facility",
@@ -76,9 +76,9 @@ export class World implements IWorld {
             const home = this.districts.living.nextFillingPlace();
             const hasCar = Math.random() < param.region.privateCarRate;
             const individual = new Individual({
+                workPlace: undefined,
                 isDoctor: false,
                 param: param.individual,
-                workPlace: Math.random() < param.region.unemploymentRate? undefined : this.districts.work.randomPlace(),
                 currentPlace: home,
                 home,
                 hasCar,
@@ -99,6 +99,16 @@ export class World implements IWorld {
             this.individuals.push(individual);
         }
 
+        this.randomizeIndivisuals();
+        for (let i = 0; i < this.population; i++){
+            const workPlace = Math.random() < param.region.unemploymentRate? undefined : this.districts.work.nextAvailablePlace();
+            this.individuals[i].workPlace = workPlace;
+            if (workPlace){
+                workPlace.push(this.individuals[i]);
+            }
+        }
+
+        this.districts.work.places.forEach(p => p.clear());
         this.randomizeIndivisuals();
         const docNum = param.medicine.doctorNum;
         for (let i = 0; i < docNum; i++) {
