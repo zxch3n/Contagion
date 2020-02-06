@@ -18,19 +18,28 @@ const world = new World({
             [250, 8],
             [125, 16]
         ],
-        partyRate: 0.1,
+        partyRate: 0.05,
     },
     medicine: {
         confirmRate: 0.05,
-        cureRateInHospital: 0.002,
-        visitingHospitalRate: 0.05,
+        cureRateInHospital: 0.0002,
+        cureRateOnMedicalBed: 0.0004,
+        deteriorateFactorOnMedicalBed: 0.5,
+        visitingHospitalRate: 0.005,
         doctorNum: 200,
-        infactiousRateBetweenDoctorAndPatient: 0,
+        infactiousRateBetweenDoctorAndPatient: 1 / 9000,
         infactiousRateBetweenPatients: 1 / 3000,
-        medicalBedNumber: 500
+        medicalBedNumber: 0
+    },
+    individual: {
+        goOutRateWhenQuarantedAtHome: 0.01,
+        visitingHospitalRateWhenExposed: 0.02,
     },
     numberOfScenePerDay: 3,
-    origin: 'living',
+    init: {
+        origin: 'cemetery',
+        initialSize: 40
+    },
     region: {
         densityOfPopulation: 10,
         doPeriodicPhysicalExamination: true,

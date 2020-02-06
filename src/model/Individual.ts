@@ -1,6 +1,7 @@
-import {IDisease, IIndividual, Position, isInfectious, IllState, Districts, TreatmentState, QuanrantineState} from './type';
+import {IDisease, IIndividual, Position, isInfectious, IllState, Districts, TreatmentState, QuanrantineState, MedicalParam, IndividualParam} from './type';
 import {upgradeIll} from './Disease';
 import { Place, District } from './District';
+import { Hospital } from './Hospital';
 
 // TODO: 插值动画
 export class Individual implements IIndividual{
@@ -11,6 +12,7 @@ export class Individual implements IIndividual{
     wearMask: boolean;
     home: Place;
     workPlace?: Place;
+    param: IndividualParam;
     hospitalPlace?: Place;
     targetingFacilityPlaces: Place[];
     treatmentState: TreatmentState;
@@ -28,6 +30,7 @@ export class Individual implements IIndividual{
         this.targetingFacilityPlaces = data.targetingFacilityPlaces;
         this.currentPlace = data.currentPlace;
         this.treatmentState = data.treatmentState;
+        this.param = data.param;
     }
 
     get isQuarantined() {
@@ -39,6 +42,7 @@ export class Individual implements IIndividual{
     }
 
     preGoto(publicTransportDistrict: District) {
+        // TODO: sometimes people don't move
         if (this.hasCar || this.isQuarantined) {
             // do not need to use public transport
             return;
@@ -48,7 +52,6 @@ export class Individual implements IIndividual{
     }
 
     beInPlace(place: Place) {
-        // TODO: optimize
         this.currentPlace.remove(this);
         this.currentPlace = place;
         place.push(this);
@@ -59,7 +62,12 @@ export class Individual implements IIndividual{
             return;
         }
 
-        if (this.treatmentState.quanrantine === QuanrantineState.atHome) {
+        if (this.isDoctor) {
+            this.beInPlace(this.workPlace);
+            return;
+        }
+
+        if (!districts.hospital.isFull && this.treatmentState.quanrantine === QuanrantineState.atHome) {
             this.beInPlace(districts.hospital.randomPlace());
             return;
         }
@@ -88,8 +96,8 @@ export class Individual implements IIndividual{
         this.beInPlace(this.home);
     }
 
-    gotoHospital(district: District) {
-        if (this.illState === IllState.dead) {
+    gotoHospital(district: Hospital) {
+        if (this.illState === IllState.dead || this.treatmentState.quanrantine === QuanrantineState.atHospital) {
             return;
         }
 
@@ -97,33 +105,47 @@ export class Individual implements IIndividual{
     }
 
     goRandomPlace(districts: Districts) {
-        if (this.treatmentState.quanrantine === QuanrantineState.atHome) {
-            this.gotoHospital(districts.hospital);
-            return;
-        }
-
         if (this.treatmentState.quanrantine === QuanrantineState.atHospital || this.illState === IllState.dead) {
             return;
         }
 
-        if (Math.random() < this.visitingHospitalRate) {
+        if (!districts.hospital.isFull && this.treatmentState.quanrantine === QuanrantineState.atHome) {
             this.gotoHospital(districts.hospital);
+            return;
+        }
+
+        if (!districts.hospital.isFull && Math.random() < this.visitingHospitalRate) {
+            this.gotoHospital(districts.hospital);
+            return;
         }
         
         if (!this.isQuarantined){
             this.gotoFacility();
+        } else if (this.treatmentState.quanrantine === QuanrantineState.atHome) {
+            if (Math.random() < this.param.goOutRateWhenQuarantedAtHome) {
+                this.gotoFacility();
+            }
         }
     }
 
-    upgrade(disease: IDisease) {
-        this.illState = upgradeIll(this.illState, disease);
+    upgrade(disease: IDisease, param: MedicalParam) {
+        let factor = 1;
+        if (this.treatmentState.quanrantine === QuanrantineState.atHospital) {
+            factor = param.deteriorateFactorOnMedicalBed;
+        }
+
+        this.illState = upgradeIll(this.illState, disease, factor);
         if (this.illState === IllState.serious) {
-            if (this.treatmentState.quanrantine === 0) {
+            if (this.treatmentState.quanrantine <= QuanrantineState.atHome) {
                 this.treatmentState.quanrantine = QuanrantineState.atHome;
                 this.visitingHospitalRate = 1;
             }
         } else if (this.illState === IllState.exposedInfactious) {
-            this.visitingHospitalRate = 0.2;
+            this.visitingHospitalRate = this.param.visitingHospitalRateWhenExposed;
         } 
+    }
+
+    get isWorking() {
+        return this.illState <= IllState.latentlyInfactious;
     }
 }

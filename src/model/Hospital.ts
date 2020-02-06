@@ -1,9 +1,11 @@
-import { District } from "./District";
+import { District, Place } from "./District";
 import { Position, IllState, MedicalParam, QuanrantineState } from "./type";
 import { Individual } from "./Individual";
 
 export class Hospital extends District {
     name = "hospital";
+    doctors: Individual[] = [];
+    availableIndex: number = 0;
     constructor(
         public param: MedicalParam,
         public medicalBed: District,
@@ -19,6 +21,32 @@ export class Hospital extends District {
         this.medicalBed.mapPeople(this.examPerson);
     }
 
+    beforeSceneStart() {
+        this.availableIndex = 0;
+    }
+
+    get isFull(): boolean {
+        while (this.availableIndex < this.places.length) {
+            if (!this.doctors[this.availableIndex].isWorking) {
+                this.availableIndex++;
+            } else if (this.places[this.availableIndex].isFull) {
+                this.availableIndex++;
+            } else {
+                break;
+            }
+        }
+
+        return this.availableIndex >= this.places.length;
+    }
+
+    randomPlace = (): Place => {
+        if (this.isFull) {
+            throw new Error();
+        }
+
+        return this.places[this.availableIndex];
+    };
+
     hospitalize(person: Individual) {
         if (this.medicalBed.isFull) {
             person.treatmentState.quanrantine = QuanrantineState.atHome;
@@ -29,17 +57,29 @@ export class Hospital extends District {
     }
 
     examPerson = (person: Individual) => {
-        if (Math.random() < this.param.cureRateInHospital) {
-            person.illState = IllState.recovered;
-        }
-
-        if (
-            person.treatmentState.isSuspected &&
-            !person.treatmentState.isConfirmed
-        ) {
+        if (person.treatmentState.isConfirmed) {
+            if (
+                person.treatmentState.quanrantine ===
+                QuanrantineState.atHospital
+            ) {
+                if (Math.random() < this.param.cureRateOnMedicalBed) {
+                    person.illState = IllState.recovered;
+                }
+            } else if (Math.random() < this.param.cureRateInHospital) {
+                person.illState = IllState.recovered;
+            }
+            if (person.illState === IllState.recovered) {
+                person.treatmentState = {
+                    isConfirmed: false,
+                    isSuspected: false,
+                    quanrantine: QuanrantineState.none
+                };
+                person.visitingHospitalRate = this.param.visitingHospitalRate;
+                person.goHome();
+            }
+        } else if (person.treatmentState.isSuspected) {
             if (Math.random() < this.param.confirmRate) {
                 person.treatmentState.isConfirmed = true;
-                this.hospitalize(person);
             }
         }
 
@@ -50,14 +90,6 @@ export class Hospital extends District {
             person.treatmentState.isSuspected = true;
             person.visitingHospitalRate = 1;
             this.hospitalize(person);
-        } else if (person.illState === IllState.recovered) {
-            person.treatmentState = {
-                isConfirmed: false,
-                isSuspected: false,
-                quanrantine: QuanrantineState.none
-            };
-            person.visitingHospitalRate = this.param.visitingHospitalRate;
-            person.goHome();
         }
     };
 }

@@ -1,3 +1,4 @@
+// TODO: patients' priorities
 import { Hospital } from "./Hospital";
 import { Place, District, LivingQuater } from "./District";
 
@@ -56,6 +57,7 @@ export interface IIndividual {
     workPlace?: Place; // default working at home
     hospitalPlace?: Place; // default working at home
     targetingFacilityPlaces: Place[];
+    param: IndividualParam;
 }
 
 export interface RegionalParam {
@@ -69,6 +71,8 @@ export interface RegionalParam {
 export interface MedicalParam {
     doctorNum: number;
     cureRateInHospital: number;
+    cureRateOnMedicalBed: number;
+    deteriorateFactorOnMedicalBed: number;
     visitingHospitalRate: number;
     confirmRate: number;
     medicalBedNumber: number;
@@ -81,13 +85,24 @@ export interface FamilyParam {
     partyRate: number;
 }
 
+export interface IndividualParam {
+    goOutRateWhenQuarantedAtHome: number;
+    visitingHospitalRateWhenExposed: number;
+}
+
+export interface Initialization {
+    origin: keyof Districts; // TODO: 
+    initialSize: number;
+}
+
 export interface WorldParam {
+    individual: IndividualParam;
     disease: IDisease;
     numberOfScenePerDay: number; // 一天几幕, default 3
     region: RegionalParam;
     medicine: MedicalParam;
     family: FamilyParam;
-    origin: keyof Districts;
+    init: Initialization;
 }
 
 export interface IWorld {
@@ -138,6 +153,12 @@ export interface AggregatedInfo {
         atHospital: number;
         confirmed: number;
         suspected: number;
+    },
+    doctor: {
+        available: number,
+        dead: number,
+        ill: number,
+        total: number
     },
     datetime: DateTime
 }

@@ -76,7 +76,8 @@ export class World implements IWorld {
             const hasCar = Math.random() < param.region.privateCarRate;
             const individual = new Individual({
                 isDoctor: false,
-                workPlace: this.districts.work.randomPlace(),
+                param: param.individual,
+                workPlace: Math.random() < param.region.unemploymentRate? undefined : this.districts.work.randomPlace(),
                 currentPlace: home,
                 home,
                 hasCar,
@@ -97,13 +98,14 @@ export class World implements IWorld {
             this.individuals.push(individual);
         }
 
+        this.randomizeIndivisuals();
         const docNum = param.medicine.doctorNum;
         for (let i = 0; i < docNum; i++) {
-            const index = Math.floor(Math.random() * this.population);
-            this.individuals[index].isDoctor = true;
-            this.individuals[index].workPlace = this.districts.hospital.places[
+            this.individuals[i].isDoctor = true;
+            this.individuals[i].workPlace = this.districts.hospital.places[
                 i
             ];
+            this.districts.hospital.doctors.push(this.individuals[i]);
         }
 
         this.datetime = {
@@ -113,7 +115,10 @@ export class World implements IWorld {
     }
 
     start() {
-        this.individuals[0].illState = IllState.latentlyInfactious;
+        this.randomizeIndivisuals();
+        for (let i = 0; i < this.param.init.initialSize; i++) {
+            this.individuals[i].illState = IllState.incubating;
+        }
     }
 
     goToWork() {
@@ -200,7 +205,7 @@ export class World implements IWorld {
 
     upgradeDisease() {
         for (const id of this.individuals) {
-            id.upgrade(this.param.disease);
+            id.upgrade(this.param.disease, this.param.medicine);
             // Move body to cemetery
             if (id.illState === IllState.dead) {
                 id.beInPlace(this.districts.cemetery.places[0]);
@@ -214,7 +219,7 @@ export class World implements IWorld {
         }
     }
 
-    nextScene() {
+    setTimeToNextScene() {
         this.datetime.scene++;
         if (this.datetime.scene === this.numberOfScenePerDay) {
             this.datetime.day++;
@@ -224,6 +229,7 @@ export class World implements IWorld {
 
     step() {
         this.upgradeDisease();
+        this.districts.hospital.beforeSceneStart();
         this.preMove();
         this.infect();
         if (this.datetime.scene === 0) {
@@ -236,7 +242,8 @@ export class World implements IWorld {
 
         this.districts.hospital.exam();
         this.infect();
-        this.nextScene();
+        this.setTimeToNextScene();
+        this.randomizeIndivisuals();
     }
 
     isEnd() {
@@ -252,6 +259,13 @@ export class World implements IWorld {
         }
 
         return false;
+    }
+
+    randomizeIndivisuals() {
+        for (let i = 0; i < this.individuals.length; i ++) {
+            const index = Math.floor(Math.random() * this.individuals.length);
+            [this.individuals[i], this.individuals[index]] = [this.individuals[index], this.individuals[i]];
+        }
     }
 
     get aggregateInfo(): AggregatedInfo {
@@ -281,10 +295,28 @@ export class World implements IWorld {
                 confirmed: 0,
                 suspected: 0
             },
+            doctor: {
+                available: 0,
+                dead: 0,
+                ill: 0,
+                total: 0
+            },
             datetime: this.datetime
         };
 
         for (const id of this.individuals) {
+            if (id.isDoctor) {
+                agg.doctor.total ++;
+                if (id.isDead) {
+                    agg.doctor.dead ++;
+                } 
+                if (id.illState >= IllState.incubating) {
+                    agg.doctor.ill ++;
+                }
+                if (id.isWorking) {
+                    agg.doctor.available ++;
+                }
+            }
             // @ts-ignore
             agg.population[IllState[id.illState]] += 1;
             if (!id.isDead) {
@@ -318,3 +350,5 @@ export class World implements IWorld {
         return agg;
     }
 }
+
+
