@@ -7,6 +7,7 @@ import { Row, Col, Button } from "antd";
 import { G2 } from "bizcharts";
 import { theme, defaultWorldParam } from "./config";
 import { World as WorldModel } from "./model/World";
+import img from './res/virus.jpg';
 import "antd/dist/antd.css";
 import "./App.css";
 import "slick-carousel/slick/slick.css";
@@ -34,8 +35,12 @@ class App extends React.Component {
         this.world.start();
     }
 
+    componentWillMount() {
+      document.body.style.backgroundImage = `url(${img})`;
+    }
+
     playLoop = () => {
-        for (let i = 0; i < 3; i++) {
+        for (let i = 0; i < 21; i++) {
             this.world.step();
         }
 
@@ -73,10 +78,10 @@ class App extends React.Component {
                 <Col xl={14} lg={24}>
                     <World />
                     <Row>
-                        <Button onClick={this.play} style={{margin: '0.2rem 1rem'}} icon="caret-right" type="primary">Play</Button>
-                        <Button onClick={this.step} style={{margin: '0.2rem 1rem'}} icon="step-forward" type="primary">Step</Button>
-                        <Button onClick={this.pause} style={{margin: '0.2rem 1rem'}} icon="pause" type="primary">Pause</Button>
-                        <Button onClick={this.reset} style={{margin: '0.2rem 1rem'}} icon="close" type="primary">Reset</Button>
+                        <Button onClick={this.play} style={{margin: '0.2rem 1rem'}} icon="caret-right" >Play</Button>
+                        <Button onClick={this.step} style={{margin: '0.2rem 1rem'}} icon="step-forward">Step</Button>
+                        <Button onClick={this.pause} style={{margin: '0.2rem 1rem'}} icon="pause" >Pause</Button>
+                        <Button onClick={this.reset} style={{margin: '0.2rem 1rem'}} icon="close" >Reset</Button>
                     </Row>
                 </Col>
 

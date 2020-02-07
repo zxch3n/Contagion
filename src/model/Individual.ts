@@ -1,11 +1,20 @@
-import {IDisease, IIndividual, IllState, Districts, TreatmentState, QuanrantineState, MedicalParam, IndividualParam} from './type';
-import {upgradeIll} from './Disease';
-import { Place, District } from './District';
-import { Hospital } from './Hospital';
-import { IllRelation } from './IllRelation';
+import {
+    IDisease,
+    IIndividual,
+    IllState,
+    Districts,
+    TreatmentState,
+    QuanrantineState,
+    MedicalParam,
+    IndividualParam
+} from "./type";
+import { upgradeIll } from "./Disease";
+import { Place, District } from "./District";
+import { Hospital } from "./Hospital";
+import { IllRelation } from "./IllRelation";
 
 // TODO: 插值动画
-export class Individual implements IIndividual{
+export class Individual implements IIndividual {
     currentPlace: Place;
     illRelation: IllRelation = new IllRelation(this);
     illState: import("./type").IllState;
@@ -36,7 +45,10 @@ export class Individual implements IIndividual{
     }
 
     get isQuarantined() {
-        return this.treatmentState.quanrantine > 0 || this.illState === IllState.dead;
+        return (
+            this.treatmentState.quanrantine > 0 ||
+            this.illState === IllState.dead
+        );
     }
 
     get isDead() {
@@ -64,7 +76,18 @@ export class Individual implements IIndividual{
     }
 
     gotoWork(districts: Districts) {
-        if (this.isDead || this.treatmentState.quanrantine === QuanrantineState.atHospital ) {
+        if (
+            this.isDead ||
+            this.treatmentState.quanrantine === QuanrantineState.atHospital
+        ) {
+            return;
+        }
+
+        if (this.treatmentState.quanrantine === QuanrantineState.atHome) {
+            if (!districts.hospital.isFull) {
+                this.beInPlace(districts.hospital.nextAvailablePlace());
+            }
+
             return;
         }
 
@@ -73,10 +96,6 @@ export class Individual implements IIndividual{
             return;
         }
 
-        if (!districts.hospital.isFull && this.treatmentState.quanrantine === QuanrantineState.atHome) {
-            this.beInPlace(districts.hospital.nextAvailablePlace());
-            return;
-        }
 
         if (this.workPlace) {
             this.beInPlace(this.workPlace);
@@ -89,9 +108,14 @@ export class Individual implements IIndividual{
         }
 
         if (this.targetingFacilityPlaces.length >= 1) {
-            let index = Math.floor(Math.random() * this.targetingFacilityPlaces.length);
+            let index = Math.floor(
+                Math.random() * this.targetingFacilityPlaces.length
+            );
             let count = 0;
-            while (this.targetingFacilityPlaces[index].isFull && count < this.targetingFacilityPlaces.length) {
+            while (
+                this.targetingFacilityPlaces[index].isFull &&
+                count < this.targetingFacilityPlaces.length
+            ) {
                 index = (index + 1) % this.targetingFacilityPlaces.length;
                 count++;
             }
@@ -104,7 +128,7 @@ export class Individual implements IIndividual{
     }
 
     goHome() {
-        if (this.isQuarantined) {
+        if (this.treatmentState.quanrantine === QuanrantineState.atHospital) {
             return;
         }
 
@@ -112,7 +136,10 @@ export class Individual implements IIndividual{
     }
 
     gotoHospital(district: Hospital) {
-        if (this.illState === IllState.dead || this.treatmentState.quanrantine === QuanrantineState.atHospital) {
+        if (
+            this.illState === IllState.dead ||
+            this.treatmentState.quanrantine === QuanrantineState.atHospital
+        ) {
             return;
         }
 
@@ -120,23 +147,34 @@ export class Individual implements IIndividual{
     }
 
     goRandomPlace(districts: Districts) {
-        if (this.treatmentState.quanrantine === QuanrantineState.atHospital || this.illState === IllState.dead) {
+        if (
+            this.treatmentState.quanrantine === QuanrantineState.atHospital ||
+            this.illState === IllState.dead
+        ) {
             return;
         }
 
-        if (!districts.hospital.isFull && this.treatmentState.quanrantine === QuanrantineState.atHome) {
+        if (
+            !districts.hospital.isFull &&
+            this.treatmentState.quanrantine === QuanrantineState.atHome
+        ) {
             this.gotoHospital(districts.hospital);
             return;
         }
 
-        if (!districts.hospital.isFull && Math.random() < this.visitingHospitalRate) {
+        if (
+            !districts.hospital.isFull &&
+            Math.random() < this.visitingHospitalRate
+        ) {
             this.gotoHospital(districts.hospital);
             return;
         }
-        
-        if (!this.isQuarantined){
+
+        if (!this.isQuarantined) {
             this.gotoFacility();
-        } else if (this.treatmentState.quanrantine === QuanrantineState.atHome) {
+        } else if (
+            this.treatmentState.quanrantine === QuanrantineState.atHome
+        ) {
             if (Math.random() < this.param.goOutRateWhenQuarantedAtHome) {
                 this.gotoFacility();
             }
@@ -157,7 +195,7 @@ export class Individual implements IIndividual{
             }
         } else if (this.illState === IllState.exposedInfactious) {
             this.visitingHospitalRate = this.param.visitingHospitalRateWhenExposed;
-        } 
+        }
     }
 
     get isWorking() {

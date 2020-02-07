@@ -7,6 +7,7 @@ export const ChartContainer = styled.div`
     position: relative;
     border-radius: 8px;
 
+
     h3 {
         text-align: center;
         position: relative;
