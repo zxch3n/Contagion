@@ -2,10 +2,12 @@ import {IDisease, IIndividual, IllState, Districts, TreatmentState, QuanrantineS
 import {upgradeIll} from './Disease';
 import { Place, District } from './District';
 import { Hospital } from './Hospital';
+import { IllRelation } from './IllRelation';
 
 // TODO: 插值动画
 export class Individual implements IIndividual{
     currentPlace: Place;
+    illRelation: IllRelation = new IllRelation(this);
     illState: import("./type").IllState;
     hasCar: boolean;
     visitingHospitalRate: number;
@@ -39,6 +41,10 @@ export class Individual implements IIndividual{
 
     get isDead() {
         return this.illState === IllState.dead;
+    }
+
+    postInfect(other: Individual) {
+        this.illRelation.infect(other);
     }
 
     preGoto(publicTransportDistrict: District) {

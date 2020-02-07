@@ -1,4 +1,4 @@
-import { Position, IIndividual } from "./type";
+import { IIndividual } from "./type";
 import { Individual } from "./Individual";
 
 export class Place{
@@ -6,7 +6,6 @@ export class Place{
     constructor(
         public index: number,
         public district: District,
-        public position: Position,
         public max: number
     ) {
         this.people = new Set();
@@ -50,10 +49,10 @@ export class District {
     places: Place[];
     maxPopulation: number;
     availableIndex: number = 0;
-    constructor(public name: string, public position: Position, num: number, max: number) {
+    constructor(public name: string, num: number, max: number) {
         this.places = [];
         for (let i = 0; i < num; i++) {
-            this.places.push(new Place(i, this, { x: 0, y: 0 }, max));
+            this.places.push(new Place(i, this, max));
         }
 
         this.maxPopulation = max * num;
@@ -102,12 +101,12 @@ export class District {
 export class LivingQuater extends District {
     public name: string = 'living';
     private fillIndex: number = 0;
-    constructor(public position: Position, distribution: [number, number][]) {
-        super('living', position, 0, 0);
+    constructor(distribution: [number, number][]) {
+        super('living', 0, 0);
         let index = 0;
         for (const [num, familySize] of distribution) {
             for (let i = 0; i < num; i ++) {
-                this.places.push(new Place(index, this, {x: 0, y: 0}, familySize))
+                this.places.push(new Place(index, this, familySize))
                 index ++;
             }
         }

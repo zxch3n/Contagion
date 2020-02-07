@@ -12,13 +12,13 @@
     "allowSyntheticDefaultImports": true,
     "strict": false,
     "forceConsistentCasingInFileNames": true,
-    "module": "UMD",
+    "module": "esnext",
     "moduleResolution": "node",
-    // "resolveJsonModule": true,
     "experimentalDecorators": true,
     "isolatedModules": true,
     "noEmit": true,
-    "jsx": "react"
+    "jsx": "react",
+    "resolveJsonModule": true
   },
   "include": [
     "src"

@@ -15,13 +15,16 @@ import { District, LivingQuater } from "./District";
 import { Hospital } from "./Hospital";
 
 
+type Listener = (world: World)=>void;
 export class World implements IWorld {
+    aggData: AggregatedInfo[] = [];
     disease: IDisease;
     districts: Districts;
     datetime: DateTime;
     numberOfScenePerDay: number;
     individuals: Individual[];
     population: number = 0;
+    postSceneListeners: Listener[] = [];
 
     constructor(public param: WorldParam) {
         this.numberOfScenePerDay = param.numberOfScenePerDay;
@@ -33,7 +36,6 @@ export class World implements IWorld {
 
         const medicalBed = new District(
             "medicalBed",
-            { x: 0, y: 0 },
             param.medicine.medicalBedNumber,
             1
         );
@@ -41,35 +43,30 @@ export class World implements IWorld {
         this.districts = {
             medicalBed,
             living: new LivingQuater(
-                { x: 0, y: 0 },
                 param.family.familyPopulationDistribution
             ),
             publicTransport: new District(
                 "publicTransport",
-                { x: 0, y: 0 },
                 this.population / 30,
                 30
             ),
             hospital: new Hospital(
                 param.medicine,
                 medicalBed,
-                { x: 0, y: 0 },
                 param.medicine.doctorNum,
                 20
             ),
             facility: new District(
                 "facility",
-                { x: 0, y: 0 },
                 this.population / 20,
                 20
             ),
             work: new District(
                 "work",
-                { x: 0, y: 0 },
                 this.population / 10,
                 10
             ),
-            cemetery: new District("cemetery", { x: 0, y: 0 }, 1, 50000)
+            cemetery: new District("cemetery", 1, 50000)
         };
 
         for (let i = 0; i < this.population; i++) {
@@ -138,6 +135,10 @@ export class World implements IWorld {
         }
     }
 
+    setPostSceneListener(listener: Listener) {
+        this.postSceneListeners.push(listener);
+    }
+
     party() {
         const places = this.districts.living.places;
         for (let i = 0; i < places.length; i++) {
@@ -167,7 +168,7 @@ export class World implements IWorld {
     }
 
     infectOther(
-        id: IIndividual,
+        id: Individual,
         others: Set<IIndividual>,
         inHospital: boolean
     ) {
@@ -196,6 +197,7 @@ export class World implements IWorld {
             }
             if (Math.random() < rate) {
                 other.illState = IllState.incubating;
+                id.postInfect(other);
             }
         }
     }
@@ -261,6 +263,10 @@ export class World implements IWorld {
         this.infect();
         this.setTimeToNextScene();
         this.randomizeIndivisuals();
+        this.aggData.push(this.aggregateInfo);
+        for (const listener of this.postSceneListeners) {
+            listener(this);
+        }
     }
 
     isEnd() {
@@ -318,7 +324,9 @@ export class World implements IWorld {
                 ill: 0,
                 total: 0
             },
-            datetime: this.datetime
+            datetime: {
+                ...this.datetime
+            }
         };
 
         for (const id of this.individuals) {
@@ -352,6 +360,7 @@ export class World implements IWorld {
 
                 if (id.treatmentState.isConfirmed) {
                     agg.quarantined.confirmed ++;
+                    agg.quarantined.suspected --;
                 }
 
                 if (id.treatmentState.isSuspected) {

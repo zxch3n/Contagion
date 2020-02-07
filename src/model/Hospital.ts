@@ -1,5 +1,5 @@
 import { District, } from "./District";
-import { Position, IllState, MedicalParam, QuanrantineState } from "./type";
+import { IllState, MedicalParam, QuanrantineState } from "./type";
 import { Individual } from "./Individual";
 
 export class Hospital extends District {
@@ -8,11 +8,10 @@ export class Hospital extends District {
     constructor(
         public param: MedicalParam,
         public medicalBed: District,
-        position: Position,
         num: number,
         max: number
     ) {
-        super("hospital", position, num, max);
+        super("hospital", num, max);
     }
 
     exam() {
