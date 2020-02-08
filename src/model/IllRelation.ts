@@ -1,4 +1,5 @@
 import { Individual } from "./Individual";
+// TODO: R0
 
 export class IllRelation {
     from?: Individual;
