@@ -3,6 +3,7 @@ import React from "react";
 import { Chart, Geom, Axis, Tooltip, Legend } from "bizcharts";
 import DataSet from "@antv/data-set";
 import { ChartContainer } from "./styled";
+import { useIncrementalProcess } from './utils';
 
 interface Props {
     agg: AggregatedInfo[];
@@ -36,30 +37,14 @@ const dv = new DataSet.View()
         retains: ["time"]
     });
 
+
 export const StackPopulation = ({ agg }: Props) => {
-    const [data, setData] = React.useState([]);
-    const [processedData, setProcessedData] = React.useState([]);
-    React.useEffect(() => {
-        let old = processedData;
-        let newData;
-        if (agg.length > data.length) {
-            newData = agg.slice(data.length);
-        } else {
-            old = [];
-            newData = agg;
-        }
-
-        dv.source(newData);
-        setProcessedData(old.concat(dv.rows));
-        setData(agg);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [agg, agg.length]);
-
+    const data = useIncrementalProcess(agg, dv, 7);
     return (
         <ChartContainer>
             <h3>Ill State Distribution</h3>
             <Chart
-                data={processedData}
+                data={data}
                 forceFit
                 height={220}
                 padding={[20, 40, 40, 180]}

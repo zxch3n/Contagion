@@ -1,6 +1,6 @@
 import React from "react";
 import styled from "styled-components";
-import { Row } from "antd";
+
 
 const Container = styled.div`
     min-width: 700px;

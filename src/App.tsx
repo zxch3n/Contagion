@@ -126,7 +126,7 @@ class App extends React.Component {
                 <Col xl={10} lg={24}>
                     <div className="charts">
                         <StackPopulation agg={this.state.data} />
-                        {/* <DistrictDistribution agg={this.state.data} /> */}
+                        <DistrictDistribution agg={this.state.data} />
                         <PatientInfo agg={this.state.data} />
                     </div>
                 </Col>
