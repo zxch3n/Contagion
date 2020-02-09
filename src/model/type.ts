@@ -15,22 +15,24 @@ export interface IDisease {
 }
 
 export enum IllState {
-    recovered = -1,
-    susceptible = 0,
-    incubating = 1,
-    latentlyInfactious = 2,
-    exposedInfactious = 3,
-    serious = 4,
-    dead = 5,
+    recovered = 0,
+    susceptible = 1,
+    incubating = 2,
+    latentlyInfactious = 3,
+    exposedInfactious = 4,
+    serious = 5,
+    dead = 6,
 }
 
 export function isInfectious(illState: IllState) {
     return illState > 1;
 }
 
-export interface Position {
+export interface BoundingBox {
     x: number;
     y: number;
+    w: number;
+    h: number;
 }
 
 export enum QuanrantineState {
@@ -105,6 +107,10 @@ export interface WorldParam {
     init: Initialization;
 }
 
+export interface Size {
+    width: number;
+    height: number;
+}
 export interface IWorld {
     disease: IDisease;
     individuals: IIndividual[];
@@ -125,6 +131,11 @@ export interface Districts {
     medicalBed: District,
     facility: District,
     cemetery: District
+}
+
+export interface Position {
+    x: number;
+    y: number;
 }
 
 
@@ -160,5 +171,6 @@ export interface AggregatedInfo {
         ill: number,
         total: number
     },
+    R0: number;
     datetime: DateTime
 }

@@ -14,8 +14,7 @@ import { Individual } from "./Individual";
 import { District, LivingQuater } from "./District";
 import { Hospital } from "./Hospital";
 
-
-type Listener = (world: World)=>void;
+type Listener = (world: World) => void;
 export class World implements IWorld {
     aggData: AggregatedInfo[] = [];
     disease: IDisease;
@@ -30,7 +29,8 @@ export class World implements IWorld {
         this.numberOfScenePerDay = param.numberOfScenePerDay;
         this.disease = param.disease;
         this.individuals = [];
-        for (const [num, familySize] of param.family.familyPopulationDistribution) {
+        for (const [num, familySize] of param.family
+            .familyPopulationDistribution) {
             this.population += num * familySize;
         }
 
@@ -42,9 +42,7 @@ export class World implements IWorld {
 
         this.districts = {
             medicalBed,
-            living: new LivingQuater(
-                param.family.familyPopulationDistribution
-            ),
+            living: new LivingQuater(param.family.familyPopulationDistribution),
             publicTransport: new District(
                 "publicTransport",
                 this.population / 30,
@@ -56,16 +54,8 @@ export class World implements IWorld {
                 param.medicine.doctorNum,
                 20
             ),
-            facility: new District(
-                "facility",
-                this.population / 20,
-                20
-            ),
-            work: new District(
-                "work",
-                this.population / 10,
-                10
-            ),
+            facility: new District("facility", this.population / 20, 20),
+            work: new District("work", this.population / 10, 10),
             cemetery: new District("cemetery", 1, 50000)
         };
 
@@ -97,22 +87,23 @@ export class World implements IWorld {
         }
 
         this.randomizeIndivisuals();
-        for (let i = 0; i < this.population; i++){
-            const workPlace = Math.random() < param.region.unemploymentRate? undefined : this.districts.work.nextAvailablePlace();
+        for (let i = 0; i < this.population; i++) {
+            const workPlace =
+                Math.random() < param.region.unemploymentRate
+                    ? undefined
+                    : this.districts.work.nextAvailablePlace();
             this.individuals[i].workPlace = workPlace;
-            if (workPlace){
+            if (workPlace) {
                 workPlace.push(this.individuals[i]);
             }
         }
 
-        this.districts.work.places.forEach(p => p.clear());
+        this.districts.work.places.forEach((p) => p.clear());
         this.randomizeIndivisuals();
         const docNum = param.medicine.doctorNum;
         for (let i = 0; i < docNum; i++) {
             this.individuals[i].isDoctor = true;
-            this.individuals[i].workPlace = this.districts.hospital.places[
-                i
-            ];
+            this.individuals[i].workPlace = this.districts.hospital.places[i];
             this.districts.hospital.doctors.push(this.individuals[i]);
         }
 
@@ -147,7 +138,7 @@ export class World implements IWorld {
             }
 
             if (Math.random() < this.param.family.partyRate) {
-                const b = (i + Math.floor(Math.random() * 10) + 1) % 500;
+                const b = (i + Math.floor(Math.random() * 10) + 1) % this.districts.living.places.length;
                 places[i].merge(places[b]);
             }
         }
@@ -167,13 +158,20 @@ export class World implements IWorld {
         }
     }
 
-    infectOther(
-        id: Individual,
-        others: Set<IIndividual>,
-        inHospital: boolean
-    ) {
+    infectOther(id: Individual, others: Set<IIndividual>, inHospital: boolean) {
         if (!isInfectious(id.illState)) {
             return;
+        }
+
+        let rate = this.param.disease.infectiousRate;
+        if (inHospital) {
+            if (id.isDoctor) {
+                rate = this.param.medicine
+                    .infactiousRateBetweenDoctorAndPatient;
+            } else {
+                rate = this.param.medicine
+                    .infactiousRateBetweenDoctorAndPatient;
+            }
         }
 
         for (
@@ -185,16 +183,11 @@ export class World implements IWorld {
                 continue;
             }
 
-            let rate = this.param.disease.infectiousRate;
-            if (inHospital) {
-                if (id.isDoctor || other.isDoctor) {
-                    rate = this.param.medicine
-                        .infactiousRateBetweenDoctorAndPatient;
-                } else {
-                    rate = this.param.medicine
-                        .infactiousRateBetweenDoctorAndPatient;
-                }
+            if (inHospital && other.isDoctor) {
+                rate = this.param.medicine
+                    .infactiousRateBetweenDoctorAndPatient;
             }
+
             if (Math.random() < rate) {
                 other.illState = IllState.incubating;
                 id.postInfect(other);
@@ -211,7 +204,8 @@ export class World implements IWorld {
             this.infectOther(
                 id,
                 id.currentPlace.people,
-                id.currentPlace.district === this.districts.hospital || id.currentPlace.district === this.districts.medicalBed
+                id.currentPlace.district === this.districts.hospital ||
+                    id.currentPlace.district === this.districts.medicalBed
             );
         }
     }
@@ -285,9 +279,12 @@ export class World implements IWorld {
     }
 
     randomizeIndivisuals() {
-        for (let i = 0; i < this.individuals.length; i ++) {
+        for (let i = 0; i < this.individuals.length; i++) {
             const index = Math.floor(Math.random() * this.individuals.length);
-            [this.individuals[i], this.individuals[index]] = [this.individuals[index], this.individuals[i]];
+            [this.individuals[i], this.individuals[index]] = [
+                this.individuals[index],
+                this.individuals[i]
+            ];
         }
     }
 
@@ -326,20 +323,30 @@ export class World implements IWorld {
             },
             datetime: {
                 ...this.datetime
-            }
+            },
+            R0: 0
         };
 
+        const containedPatients = this.individuals.filter(
+            (x) => x.treatmentState.isConfirmed
+        );
+        agg.R0 = containedPatients.length?
+            containedPatients.reduce(
+                (left, cur) =>
+                    left + (cur.illRelation.to ? cur.illRelation.to.length : 0),
+                0
+            ) / (containedPatients.length) : 0;
         for (const id of this.individuals) {
             if (id.isDoctor) {
-                agg.doctor.total ++;
+                agg.doctor.total++;
                 if (id.isDead) {
-                    agg.doctor.dead ++;
-                } 
+                    agg.doctor.dead++;
+                }
                 if (id.illState >= IllState.incubating) {
-                    agg.doctor.ill ++;
+                    agg.doctor.ill++;
                 }
                 if (id.isWorking) {
-                    agg.doctor.available ++;
+                    agg.doctor.available++;
                 }
             }
             // @ts-ignore
@@ -359,12 +366,12 @@ export class World implements IWorld {
                 }
 
                 if (id.treatmentState.isConfirmed) {
-                    agg.quarantined.confirmed ++;
-                    agg.quarantined.suspected --;
+                    agg.quarantined.confirmed++;
+                    agg.quarantined.suspected--;
                 }
 
                 if (id.treatmentState.isSuspected) {
-                    agg.quarantined.suspected ++;
+                    agg.quarantined.suspected++;
                 }
             }
         }
@@ -376,5 +383,3 @@ export class World implements IWorld {
         return agg;
     }
 }
-
-

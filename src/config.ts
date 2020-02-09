@@ -194,19 +194,19 @@ export const defaultWorldParam: WorldParam = {
         cureRate: 1 / 3 / 30 / 50,
         deadRate: 1 / 3 / 30 / 100,
         immuneRate: 0,
-        infectiousRate: 1 / 5000,
+        infectiousRate: 0.02,
         name: 'virus',
         selfRecoverRate: 0.0,
         seriousRate: 1 / 3 / 50,
-        toExposedInfactiousRate: 1 / 3 / 100,
+        toExposedInfactiousRate: 1 / 3 / 500,
         toLatentlyInfactiousRate: 1 / 3 / 4,
     },
     family: {
         familyPopulationDistribution: [
-            [1000, 2],
-            [500, 4],
-            [250, 8],
-            [125, 16]
+            [60, 2],
+            [75, 4],
+            [30, 8],
+            [15, 16]
         ],
         partyRate: 0.05,
     },
@@ -216,10 +216,10 @@ export const defaultWorldParam: WorldParam = {
         cureRateOnMedicalBed: 0.0004,
         deteriorateFactorOnMedicalBed: 0.5,
         visitingHospitalRate: 0.005,
-        doctorNum: 1000,
+        doctorNum: 10,
         infactiousRateBetweenDoctorAndPatient: 1 / 50000,
         infactiousRateBetweenPatients: 1 / 10000,
-        medicalBedNumber: 2000
+        medicalBedNumber: 4
     },
     individual: {
         goOutRateWhenQuarantedAtHome: 0.01,
@@ -228,7 +228,7 @@ export const defaultWorldParam: WorldParam = {
     numberOfScenePerDay: 3,
     init: {
         origin: 'cemetery',
-        initialSize: 40
+        initialSize: 4
     },
     region: {
         densityOfPopulation: 10,

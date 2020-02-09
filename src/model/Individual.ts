@@ -28,6 +28,7 @@ export class Individual implements IIndividual {
     targetingFacilityPlaces: Place[];
     treatmentState: TreatmentState;
     isDoctor: boolean;
+    estimatedR0: number | undefined = undefined;
 
     constructor(data: IIndividual) {
         this.isDoctor = data.isDoctor;
@@ -55,6 +56,10 @@ export class Individual implements IIndividual {
         return this.illState === IllState.dead;
     }
 
+    get cannotMoveAtAll() {
+        return this.treatmentState.quanrantine === QuanrantineState.atHospital || this.illState === IllState.dead;
+    }
+
     postInfect(other: Individual) {
         this.illRelation.infect(other);
     }
@@ -76,10 +81,7 @@ export class Individual implements IIndividual {
     }
 
     gotoWork(districts: Districts) {
-        if (
-            this.isDead ||
-            this.treatmentState.quanrantine === QuanrantineState.atHospital
-        ) {
+        if (this.cannotMoveAtAll) {
             return;
         }
 
@@ -103,6 +105,10 @@ export class Individual implements IIndividual {
     }
 
     gotoFacility() {
+        if (this.cannotMoveAtAll) {
+            return;
+        }
+
         if (this.isQuarantined) {
             return;
         }
@@ -128,7 +134,7 @@ export class Individual implements IIndividual {
     }
 
     goHome() {
-        if (this.treatmentState.quanrantine === QuanrantineState.atHospital) {
+        if (this.cannotMoveAtAll) {
             return;
         }
 
@@ -136,10 +142,7 @@ export class Individual implements IIndividual {
     }
 
     gotoHospital(district: Hospital) {
-        if (
-            this.illState === IllState.dead ||
-            this.treatmentState.quanrantine === QuanrantineState.atHospital
-        ) {
+        if (this.cannotMoveAtAll) {
             return;
         }
 
@@ -147,10 +150,7 @@ export class Individual implements IIndividual {
     }
 
     goRandomPlace(districts: Districts) {
-        if (
-            this.treatmentState.quanrantine === QuanrantineState.atHospital ||
-            this.illState === IllState.dead
-        ) {
+        if (this.cannotMoveAtAll) {
             return;
         }
 
