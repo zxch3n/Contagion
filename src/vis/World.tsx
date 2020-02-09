@@ -56,49 +56,49 @@ export class World extends React.Component<Props> {
                 { x: 200, y: 80, h: 180, w: 180 },
                 this.ctx!,
                 "Facility",
-                "rgba(255, 255, 255, 0.2)"
+                "rgba(0, 255, 255, 0.08)"
             ),
             hospital: new District(
                 this.world.districts.hospital,
                 { x: 200, y: 280, h: 200, w: 180 },
                 this.ctx!,
                 "Hospital",
-                "rgba(255, 255, 255, 0.2)"
+                "rgba(0, 255, 255, 0.08)"
             ),
             work: new District(
                 this.world.districts.work,
                 { x: 400, y: 0, h: 480, w: 300 },
                 this.ctx!,
                 "Work",
-                "rgba(255, 255, 255, 0.2)"
+                "rgba(0, 255, 255, 0.08)"
             ),
             publicTransport: new District(
                 this.world.districts.publicTransport,
                 { x: 200, y: 0, h: 60, w: 180 },
                 this.ctx!,
                 "Public Transport",
-                "rgba(255, 255, 255, 0.2)"
+                "rgba(0, 255, 255, 0.08)"
             ),
             living: new District(
                 this.world.districts.living,
                 { x: 0, y: 0, h: 480, w: 180 },
                 this.ctx!,
                 "Residential Area",
-                "rgba(255, 255, 255, 0.2)"
+                "rgba(0, 255, 255, 0.08)"
             ),
             medicalBed: new District(
                 this.world.districts.medicalBed,
                 { x: 0, y: 500, h: 100, w: 580 },
                 this.ctx!,
                 "Quarantine Area",
-                "rgba(255, 255, 255, 0.2)"
+                "rgba(0, 255, 255, 0.08)"
             ),
             cemetery: new District(
                 this.world.districts.cemetery,
                 { x: 600, y: 500, h: 100, w: 100 },
                 this.ctx!,
                 "Cemetery",
-                "rgba(255, 255, 255, 0.2)"
+                "rgba(0, 255, 255, 0.08)"
             ),
         };
 

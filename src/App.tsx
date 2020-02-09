@@ -28,7 +28,7 @@ const DatetimeContainer = styled.div`
     left: 1em;
     top: 1em;
     padding: 0.5em 1em;
-    background-color: rgba(10, 20, 90, 0.6);
+    background-color: rgba(10, 20, 90, 0.3);
     border: 1px solid rgb(15, 30, 150);
     color: #aae;
     border-radius: 4px;
