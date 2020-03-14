@@ -2,6 +2,7 @@
   "name": "corona",
   "version": "0.1.0",
   "private": true,
+  "homepage": "https://zxch3n.github.io/Contagion/",
   "dependencies": {
     "@ant-design/dark-theme": "^1.0.3",
     "@antv/data-set": "^0.10.2",
@@ -79,7 +80,8 @@
   "scripts": {
     "start": "node scripts/start.js",
     "build": "node scripts/build.js",
-    "test": "node scripts/test.js"
+    "test": "node scripts/test.js",
+    "deploy": "gh-pages -d build"
   },
   "eslintConfig": {
     "extends": "react-app"
@@ -97,6 +99,7 @@
     ]
   },
   "devDependencies": {
+    "gh-pages": "^2.2.0",
     "less-loader": "^5.0.0",
     "ts-node": "^8.6.2"
   },

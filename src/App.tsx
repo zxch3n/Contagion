@@ -107,9 +107,12 @@ class App extends React.Component {
         this.looping = false;
     };
 
+    setting = () => {
+
+    }
+
     render() {
         const style = {
-            minHeight: 'calc(100vh - 200px)',
             boxShadow: '3px 0px 2px 0px rgba(0, 0, 0, 0.2)',
             padding: '2em',
         };
@@ -151,12 +154,11 @@ class App extends React.Component {
                             Reset
                         </Button>
                         <Button
-                            onClick={() => {
-                                console.log("test");
-                            }}
+                            onClick={this.setting}
                             style={{ margin: "0.5rem " }}
+                            icon='setting'
                         >
-                            Test
+                            Settings
                         </Button>
                     </Row>
                 </Col>
