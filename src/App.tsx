@@ -4,6 +4,14 @@ import { DistrictDistribution } from "./vis/DistrictDistribution";
 import { PatientInfo } from "./vis/PatientInfo";
 import { R0 } from "./vis/R0";
 import { World } from "./vis/World";
+
+import {
+    CaretRightOutlined,
+    CloseOutlined,
+    PauseOutlined,
+    StepForwardOutlined,
+} from '@ant-design/icons';
+
 import { Row, Col, Button } from "antd";
 import { G2 } from "bizcharts";
 import { theme, defaultWorldParam } from "./config";
@@ -13,8 +21,9 @@ import "antd/dist/antd.css";
 import "./App.css";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
-import { AggregatedInfo } from "./model/type";
+import { AggregatedInfo, WorldParam } from "./model/type";
 import styled from "styled-components";
+import { Setting } from "./setting";
 
 const { Global } = G2; // 获取 Global 全局对象
 // @ts-ignore
@@ -36,7 +45,7 @@ const DatetimeContainer = styled.div`
 `;
 
 class App extends React.Component {
-    world = new WorldModel(defaultWorldParam);
+    world = new WorldModel(JSON.parse(localStorage.getItem('world-param')) || defaultWorldParam);
     looping: boolean = false;
     state: {
         data: AggregatedInfo[];
@@ -107,8 +116,8 @@ class App extends React.Component {
         this.looping = false;
     };
 
-    setting = () => {
-
+    setParam = (param: WorldParam) => {
+        this.world.param = param;
     }
 
     render() {
@@ -118,7 +127,7 @@ class App extends React.Component {
         };
         const { datetime } = this.world;
         return (
-            <Row className={"main"} type={'flex'} justify={'center'}>
+            <Row className={"main"} justify={'center'}>
                 <Col xl={12} lg={24} style={style}>
                     <World world={this.world} ref={this.worldRef} />
                     <Row>
@@ -126,7 +135,7 @@ class App extends React.Component {
                             <Button
                                 onClick={this.play}
                                 style={{ margin: "0.5rem 0.5rem 0.5rem 0" }}
-                                icon="caret-right"
+                                icon={<CaretRightOutlined />}
                             >
                                 Play
                             </Button>
@@ -134,7 +143,7 @@ class App extends React.Component {
                             <Button
                                 onClick={this.pause}
                                 style={{ margin: "0.5rem 0.5rem 0.5rem 0" }}
-                                icon="pause"
+                                icon={<PauseOutlined />}
                             >
                                 Pause
                             </Button>
@@ -142,24 +151,18 @@ class App extends React.Component {
                         <Button
                             onClick={this.step}
                             style={{ margin: "0.5rem" }}
-                            icon="step-forward"
+                            icon={<StepForwardOutlined />}
                         >
                             Step
                         </Button>
                         <Button
                             onClick={this.reset}
                             style={{ margin: "0.5rem " }}
-                            icon="close"
+                            icon={<CloseOutlined />}
                         >
                             Reset
                         </Button>
-                        <Button
-                            onClick={this.setting}
-                            style={{ margin: "0.5rem " }}
-                            icon='setting'
-                        >
-                            Settings
-                        </Button>
+                        <Setting setParams={this.setParam}/>
                     </Row>
                 </Col>
                 <Col xl={4} lg={11} style={style}>
